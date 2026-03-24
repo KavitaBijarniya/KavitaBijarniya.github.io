@@ -1,6 +1,29 @@
 import { Mail, Phone, MapPin, Linkedin, Github, Send } from 'lucide-react';
+import { useState } from 'react';
 
 const Contact = () => {
+  const [result, setResult] = useState("");
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setResult("Sending...");
+
+  const formData = new FormData(e.target);
+
+  const response = await fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    setResult("Message sent successfully ✅");
+    e.target.reset();
+  } else {
+    setResult("Something went wrong ❌");
+  }
+};
   return (
     <section id="contact" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,7 +100,15 @@ const Contact = () => {
 
           <div className="bg-gradient-to-br from-blue-50 to-gray-50 p-8 rounded-lg border border-blue-100">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Send a Message</h3>
-            <form className="space-y-4">
+
+            <form 
+              onSubmit={handleSubmit} className="space-y-4"
+            >
+              <input type="checkbox" name="botcheck" style={{display:"none"}} />
+              <input type="hidden" name="access_key" value={import.meta.env.VITE_WEB3FORMS_KEY} />
+              <input type="hidden" name="subject" value="New Message from Portfolio" />
+              <input type="hidden" name="from_name" value="Kavita Portfolio" />
+
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Name
@@ -85,8 +116,10 @@ const Contact = () => {
                 <input
                   type="text"
                   id="name"
+                  name="name"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="John Doe"
+                  required
                 />
               </div>
 
@@ -97,8 +130,10 @@ const Contact = () => {
                 <input
                   type="email"
                   id="email"
+                  name="email"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="john@example.com"
+                  required
                 />
               </div>
 
@@ -108,9 +143,11 @@ const Contact = () => {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows={5}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
                   placeholder="Tell me about your project or opportunity..."
+                  required
                 ></textarea>
               </div>
 
@@ -121,7 +158,9 @@ const Contact = () => {
                 <Send size={20} className="mr-2" />
                 Send Message
               </button>
+              <p className="text-sm text-gray-700 mt-2">{result}</p>
             </form>
+
           </div>
         </div>
       </div>
